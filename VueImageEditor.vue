@@ -124,7 +124,7 @@ export default {
       this.repaint()
     },
     loadImage () {
-      this.$emit('clear')
+      this.$emit('editor-refreshed')
       this.clearCanvas()
       this.clearFile()
       this.fileInput.click()
@@ -134,6 +134,7 @@ export default {
       if (!imageFile.type.startsWith('image')) return
       this.image = new Image()
       this.image.addEventListener('load', () => {
+        this.$emit('image-loaded')
         this.isImageLoaded = true
         this.naturalImageWidth = this.image.width
         this.naturalImageHeight = this.image.height
