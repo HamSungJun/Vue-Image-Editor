@@ -125,6 +125,7 @@ export default {
     },
     loadImage () {
       this.$emit('editor-refreshed')
+      this.clearControlValue()
       this.clearCanvas()
       this.clearFile()
       this.fileInput.click()
@@ -163,8 +164,8 @@ export default {
         newWidth = newHeight * imageRatio
       }
 
-      const offsetX = newWidth < this.canvasWidth ? ((this.canvasWidth - newWidth)) : 0
-      const offsetY = newHeight < this.canvasHeight ? ((this.canvasHeight - newHeight)) : 0
+      const offsetX = newWidth < this.canvasWidth ? ((this.canvasWidth - newWidth) / 2) : 0
+      const offsetY = newHeight < this.canvasHeight ? ((this.canvasHeight - newHeight) / 2) : 0
 
       return {
         offsetX,
@@ -182,18 +183,21 @@ export default {
       } else {
         this.nextX += this.movementX
         this.nextY += this.movementY
-        this.movementX = 0
-        this.movementY = 0
       }
+
+      this.movementX = 0
+      this.movementY = 0
+
       const scaledWidth = newWidth * this.scale
       const scaledHeight = newHeight * this.scale
-      const widthDiff = (scaledWidth - this.canvasWidth) / 2
-      const heightDiff = (scaledHeight - this.canvasHeight) / 2
-      const x = this.nextX * this.scale
-      const y = this.nextY * this.scale
+      const widthDiff = (scaledWidth - newWidth) / 2
+      const heightDiff = (scaledHeight - newHeight) / 2
+      const x = this.nextX / this.scale
+      const y = this.nextY / this.scale
       let { rx, ry } = this.reflectAngleToPosition(x, y)
       rx += -widthDiff
       ry += -heightDiff
+
       return {
         nextX: rx,
         nextY: ry,
@@ -237,11 +241,14 @@ export default {
       this.context.lineTo(this.canvasWidth - this.clipThickNess, this.clipThickNess)
       this.context.clip()
     },
+    clearControlValue () {
+      this.scale = 1
+      this.nextX = 0
+      this.nextY = 0
+    },
     clearCanvas () {
-      this.context.save()
       this.context.setTransform(1, 0, 0, 1, 0, 0)
       this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
-      this.context.restore()
     },
     clearFile () {
       if (this.blobURL) URL.revokeObjectURL(this.blobURL)
